@@ -1,0 +1,41 @@
+activation: !!python/object:torch.nn.modules.activation.Softplus
+  _backward_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _buffers: !!python/object/apply:collections.OrderedDict
+  - []
+  _forward_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _forward_pre_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _is_full_backward_hook: null
+  _load_state_dict_pre_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _modules: !!python/object/apply:collections.OrderedDict
+  - []
+  _non_persistent_buffers_set: !!set {}
+  _parameters: !!python/object/apply:collections.OrderedDict
+  - []
+  _state_dict_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  beta: 1
+  threshold: 20
+  training: true
+dropout: 0
+hidden_dim_list:
+- 256
+- 256
+- 256
+init_weights: null
+input_dim: 4
+lossf: !!python/name:Utils.torchUtils.%3Clambda%3E ''
+optim_args:
+  lr: 0.005
+  weight_decay: 0
+optimizer: !!python/name:torch.optim.adam.Adam ''
+output_dim: 1
+scheduler_dict:
+  reduceLRonPlateau:
+    factor: 0.95
+    min_lr: 1.0e-09
+    patience: 50
+x_scaler: null

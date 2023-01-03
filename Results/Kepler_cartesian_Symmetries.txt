@@ -1,0 +1,5 @@
+Kepler_cartesian SymHnn learned translation vector: Parameter containing:
+tensor([[0.0048, 0.0224]], requires_grad=True),
+ learned matrix Parameter containing:
+tensor([[[ 3.6604e-05,  6.2002e-01],
+         [-6.1990e-01, -3.8252e-05]]], requires_grad=True)

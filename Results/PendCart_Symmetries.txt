@@ -1,0 +1,5 @@
+PendCart SymHnn learned translation vector: Parameter containing:
+tensor([[ 1.0000e+00, -1.3298e-05]], requires_grad=True),
+ learned matrix Parameter containing:
+tensor([[[-1.2949e-06, -3.4447e-07],
+         [ 5.0885e-08, -2.6762e-06]]], requires_grad=True)

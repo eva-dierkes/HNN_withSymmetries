@@ -27,7 +27,7 @@ if __name__ == "__main__":
     criteria = None             #criteria as named in netConfig['train_args']
     criteria_values =  None     #values that should be used for criteria
 
-    save_tikz = False
+    save_tikz = True
 
     for data_config_tag in data_config_list:
         if data_config_tag == 'PendCart':
@@ -66,9 +66,9 @@ if __name__ == "__main__":
         ############  Plot level sets ##############################################################
         nbr_models = len(label_list)
         const_p = {'Kepler_cartesian': [-10,0,10],
-                    'PendCart':[-10,0,10]}
-        const_q = {'Kepler_cartesian': [-10,1,10],
-                    'PendCart':[-10,0,10]}
+                    'PendCart':[-5,0,5]}
+        const_q = {'Kepler_cartesian': [-10,3,10],
+                    'PendCart':[-5,0,5]}
 
         fig3,ax3 = plt.subplots(2,len(const_q[data_config_tag]))
         fig3.suptitle(f'hamiltonian level sets')
@@ -81,14 +81,41 @@ if __name__ == "__main__":
                                                                     [5.5, 5.5],
                                                                     [7.0, 7.0],
                                                                     [8.5, 8.5],
-                                                                    [10.0,10.0]]),
+                                                                    [10.0,10.0],
+                                                                    [12.5, 12.5],
+                                                                    [14.0, 14.0],
+                                                                    [15.5, 15.5],
+                                                                    [17.0, 17.0],
+                                                                    [18.5, 18.5],
+                                                                    [20.0,20.0],]),
                                     'PendCart': np.array([[0.0, 0.0],
-                                                            [0.0, 1.5],
+                                                            [0.0, 1.0],
+                                                            [0.0, 2.0],
                                                             [0.0, 3.0],
-                                                            [0.0, 4.5],
-                                                            [0.0, 6.0],
-                                                            [0.0, 7.5]]),
+                                                            [0.0, 4.0],
+                                                            [0.0, 5.0],
+                                                            [0.0, 6.0]]),
                                                                     }
+        n=50
+        q_grid_PendCart = np.empty((ref_model.dimq,n))
+        q_grid_PendCart[0,] = np.linspace(-10,10,n)
+        q_grid_PendCart[1,] = np.linspace(-2*np.pi,2*np.pi,n)
+        q_grid_Kepler = np.empty((ref_model.dimq,n))
+        q_grid_Kepler[0,] = np.linspace(-20,20,n)
+        q_grid_Kepler[1,] = np.linspace(-20,20,n)
+        q_grid= {'PendCart':         q_grid_PendCart,
+                 'Kepler_cartesian': q_grid_Kepler
+                }
+
+        p_grid_PendCart = np.empty((ref_model.dimq,n))
+        p_grid_PendCart[0,] = np.linspace(-2,2,n)
+        p_grid_PendCart[1,] = np.linspace(-2*np.pi,2*np.pi,n)
+        p_grid_Kepler = np.empty((ref_model.dimq,n))
+        p_grid_Kepler[0,] = np.linspace(-20,20,n)
+        p_grid_Kepler[1,] = np.linspace(-20,20,n)
+        p_grid= {'PendCart':            p_grid_PendCart,
+                 'Kepler_cartesian':    p_grid_Kepler
+                }
 
         for i, (model, hamiltonian) in enumerate(zip(model_list,hamiltonian_list)):
             if '_NN' in label_list[i]:
@@ -105,6 +132,7 @@ if __name__ == "__main__":
                 line_list_constant_p[j],label_list_constant_p[j] = plotUtils.plot_level_sets_constant_p(ref_model, model,
                                                                                                     hamiltonian,
                                                                                                     constant_p=const_p[data_config_tag][j],
+                                                                                                    q_grid=q_grid[data_config_tag],
                                                                                                     color=[color[i]],
                                                                                                     label=label_list[i],
                                                                                                     line_list=line_list_constant_p[j], 
@@ -115,6 +143,7 @@ if __name__ == "__main__":
                 line_list_constant_q[j],label_list_constant_q[j] = plotUtils.plot_level_sets_constant_q(  model,
                                                                                                     hamiltonian,
                                                                                                     constant_q=const_q[data_config_tag][j],
+                                                                                                    p_grid = p_grid[data_config_tag],
                                                                                                     color=[color[i]],
                                                                                                     label=label_list[i],
                                                                                                     line_list=line_list_constant_q[j], 
@@ -125,9 +154,7 @@ if __name__ == "__main__":
 
 
         if save_tikz:
-            tikzplotlib.save(f'Results/{data_config_tag}_LevelSets_zeroq.tex')
-            plt.close()
-            tikzplotlib.save(f'Results/{data_config_tag}_LevelSets_potetial.tex')
+            tikzplotlib.save(f'Results/{data_config_tag}_LevelSets.tex')
             plt.close()
 
         ############  Eval models on single trajectory #######################################################
@@ -164,6 +191,8 @@ if __name__ == "__main__":
             tikzplotlib.save(f'Results/{data_config_tag}_S_err.tex')
             plt.close()
             tikzplotlib.save(f'Results/{data_config_tag}_S.tex')
+            plt.close()
+            tikzplotlib.save(f'Results/{data_config_tag}_S_on_qPlane.tex')
             plt.close()
 
         ############  Plot H's for trajectory ##############################################################
@@ -202,7 +231,7 @@ if __name__ == "__main__":
         fig5, ax5 = plt.subplots()
         fig6, ax6 = plt.subplots()
         n=1000
-        grid = ref_model.generate_random_inital_value(quantity=n)
+        grid = ref_model.generate_random_inital_value(quantity=n,region_tag='Evaluation')
         df_v_hat, loss_v_hat = evalUtils.l_sym_term_for_model_on_grid(grid, dH=model_list[0].ode, model=model_list[0], model_tag=f'v_hat({label_list[0]},v_exact)',symmetry=(ref_model.rotation_factor[0], ref_model.translation_factor[0]), dimq=ref_model.dimq)
         plotUtils.plot_l_sym_overq(df_v_hat,fig=fig4,ax=ax4[0,0],title='v_hat(H_exact,v_exact)\n{ref_model.rotation_factor[0]}\n{ref_model.translation_factor[0]}')
         plotUtils.plot_l_sym_over_points(df_v_hat, color=color[0],fig=fig5, ax=ax5,title=None,label=f'v_hat({label_list[0]},v_theta)')

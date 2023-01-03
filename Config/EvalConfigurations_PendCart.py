@@ -3,8 +3,8 @@ import torch
 cfg = {
     'PendCart': {
         't_start': 0,
-        't_end': 10,
-        'sampling_rate': 100,
+        't_end': 200,
+        'sampling_rate': 500,
         'region_tag' : ''
     },
 }

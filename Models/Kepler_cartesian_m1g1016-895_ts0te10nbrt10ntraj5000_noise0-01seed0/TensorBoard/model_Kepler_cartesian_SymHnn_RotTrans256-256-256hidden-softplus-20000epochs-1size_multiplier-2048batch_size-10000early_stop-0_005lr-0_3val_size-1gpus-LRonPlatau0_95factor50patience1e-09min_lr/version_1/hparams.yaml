@@ -1,0 +1,190 @@
+activation: !!python/object:torch.nn.modules.activation.Softplus
+  _backward_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _buffers: !!python/object/apply:collections.OrderedDict
+  - []
+  _forward_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _forward_pre_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _is_full_backward_hook: null
+  _load_state_dict_pre_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  _modules: !!python/object/apply:collections.OrderedDict
+  - []
+  _non_persistent_buffers_set: !!set {}
+  _parameters: !!python/object/apply:collections.OrderedDict
+  - []
+  _state_dict_hooks: !!python/object/apply:collections.OrderedDict
+  - []
+  beta: 1
+  threshold: 20
+  training: true
+dropout: 0
+hidden_dim_list:
+- 256
+- 256
+- 256
+init_weights: null
+input_dim: 4
+lossf: null
+optim_args:
+  lr: 0.005
+  weight_decay: 0
+optimizer: !!python/name:torch.optim.adam.Adam ''
+output_dim: 1
+scheduler_dict:
+  reduceLRonPlateau:
+    factor: 0.95
+    min_lr: 1.0e-09
+    patience: 50
+state_sampler: !!python/object/apply:builtins.getattr
+- !!python/object:Utils.odeUtils.Kepler_cartesian
+  M_inv: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - &id001 !!python/name:numpy.ndarray ''
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 2
+      - 2
+    - &id002 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - false
+    - !!binary |
+      AAAAAAAA8D8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA8D8=
+  dimq: 2
+  g: 1016.895192894334
+  k: 1016.895192894334
+  m: 1
+  nbr_states: 4
+  rotation_factor: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 1
+      - 2
+      - 2
+    - *id002
+    - false
+    - !!binary |
+      AAAAAAAAAADNO39mnqDmP807f2aeoOa/AAAAAAAAAAA=
+  sampler: !!python/object:scipy.stats._qmc.Halton
+    base:
+    - 2
+    - 3
+    - 5
+    - 7
+    d: 4
+    num_generated: 81
+    rng: !!python/object/apply:numpy.random._pickle.__generator_ctor
+      args:
+      - PCG64
+      state:
+        bit_generator: PCG64
+        has_uint32: 0
+        state:
+          inc: 240039470408695211856601085667924886815
+          state: 230424077424703500324284398738674244951
+        uinteger: 0
+    rng_seed: null
+    scramble: true
+    seed: null
+  symmGrid: &id003 !!python/object/apply:torch._utils._rebuild_tensor_v2
+  - !!python/object/apply:torch.storage._load_from_bytes
+    - !!binary |
+      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
+      wAa2SsFY97NA
+  - 0
+  - !!python/tuple
+    - 81
+    - 4
+  - !!python/tuple
+    - 4
+    - 1
+  - true
+  - !!python/object/apply:collections.OrderedDict
+    - []
+  translation_factor: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 1
+      - 2
+    - !!python/object/apply:numpy.dtype
+      args:
+      - i8
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - false
+    - !!binary |
+      AAAAAAAAAAAAAAAAAAAAAA==
+- generate_random_inital_value
+symmetry_grid: *id003
+symmetry_type:
+- Rot
+- Trans
+x_scaler: null

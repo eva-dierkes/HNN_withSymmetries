@@ -121,7 +121,7 @@ class SymHnnNet(pl.LightningModule):
             loss_dotproduct = 0
             smooth_sym_factor = 0
             
-        loss = loss_hamilton + smooth_sym_factor*(loss_symmetry + loss_sym_norm + loss_dotproduct)
+        loss = loss_hamilton + smooth_sym_factor*0.5*(loss_symmetry + loss_sym_norm + loss_dotproduct)
 
         if status != 'after':
             self.log(f'{status}/smooth_sym_factor',smooth_sym_factor, prog_bar=False, on_epoch=True, on_step=False)

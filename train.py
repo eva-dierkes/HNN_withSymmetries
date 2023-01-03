@@ -10,8 +10,8 @@ import Utils.plotUtils as plotUtils
 
 if __name__ == "__main__":
     data_config_list = [
+                        'Kepler_cartesian',
                         'PendCart',
-                        'Kepler_cartesian'
                         ] 
     net_config_list = [ 
                         'NN',

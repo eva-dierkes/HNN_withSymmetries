@@ -3,8 +3,8 @@ import torch
 cfg = {
     'Kepler_cartesian': {
         't_start': 0,
-        't_end': 10,
-        'sampling_rate': 100,
+        't_end': 200,
+        'sampling_rate': 500,
         'region_tag' : ''
     },
 }
@@ -84,7 +84,7 @@ Netcfg = {
                 },
             },
         },
-        'tag': ''#'_last-v1'                                       #tag can be used for different versions e.g. '-v2'
+        'tag': ''                                       #tag can be used for different versions e.g. '-v2'
     },
 
     'SymHnn' : {
@@ -114,7 +114,7 @@ Netcfg = {
                 },
             },
         },
-        'tag': ''#'_last-v1'
+        'tag': '_last-v3'
     },
 
 }

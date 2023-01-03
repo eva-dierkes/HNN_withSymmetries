@@ -118,20 +118,27 @@ def plot_level_sets_constant_p(exampleClass,
                                 model, 
                                 hamiltonian, 
                                 constant_p=0, 
+                                q_grid=None,
                                 color=None,
                                 label=None, 
                                 line_list=[], 
                                 label_list=[],
                                 positions_of_level_sets=None,
                                 fig=None, ax=None, minmax=None):
-    n = 50 
-    q = np.empty((model.dimq,n))
-    q[0,] = np.linspace(-10,10,n)
-    q[1,] = np.linspace(-10,10,n)
-    q1, q2 = np.meshgrid(q[0,],q[1,])
-    mesh_shape = q1.shape
-    p = constant_p * np.ones((model.dimq, n,n))     #p=0 for potential
-    grid = np.vstack([np.stack([q1,q2]),p]).reshape(2*model.dimq,-1)
+    n = 50                             
+    if q_grid is None:
+        q = np.empty((model.dimq,n))
+        q[0,] = np.linspace(-20,20,n)
+        q[1,] = np.linspace(-20,20,n)
+        q1, q2 = np.meshgrid(q[0,],q[1,])
+        mesh_shape = q1.shape
+        p = constant_p * np.ones((model.dimq, n,n))     #p=0 for potential
+        grid = np.vstack([np.stack([q1,q2]),p]).reshape(2*model.dimq,-1)
+    else:
+        q1, q2 = np.meshgrid(q_grid[0,],q_grid[1,])
+        mesh_shape = q1.shape
+        p = constant_p * np.ones((model.dimq, n,n))     #p=0 for potential
+        grid = np.vstack([np.stack([q1,q2]),p]).reshape(2*model.dimq,-1)
 
     if isinstance(exampleClass, odeUtils.Kepler_cartesian):
         not_in_grid = np.sqrt(q1**2+q2**2) < 2 
@@ -181,14 +188,29 @@ def plot_level_sets_constant_p(exampleClass,
     return line_list, label_list
 
 
-def plot_level_sets_constant_q(model, hamiltonian, constant_q=0, color=None, label=None, line_list=[], label_list=[],positions_of_level_sets=None,fig=None, ax=None, minmax=None):
+def plot_level_sets_constant_q(model, 
+                                hamiltonian, 
+                                constant_q=0, 
+                                p_grid=None,
+                                color=None, 
+                                label=None, 
+                                line_list=[], 
+                                label_list=[],
+                                positions_of_level_sets=None,
+                                fig=None, ax=None, minmax=None):
     n = 50
-    p = np.empty((model.dimq,n))
-    p[0,] = np.linspace(-10,10,n)
-    p[1,] = np.linspace(-10,10,n)
-    p1, p2 = np.meshgrid(p[0,],p[1,])
-    q = constant_q*np.ones((model.dimq, n,n))     #p=0 for potential
-    grid = np.vstack([q,np.stack([p1,p2])]).reshape(2*model.dimq,-1)
+    if p_grid is None:
+        p = np.empty((model.dimq,n))
+        p[0,] = np.linspace(-10,10,n)
+        p[1,] = np.linspace(-10,10,n)
+        p1, p2 = np.meshgrid(p[0,],p[1,])
+        q = constant_q*np.ones((model.dimq, n,n))     #p=0 for potential
+        grid = np.vstack([q,np.stack([p1,p2])]).reshape(2*model.dimq,-1)
+    else:
+        p1, p2 = np.meshgrid(p_grid[0,],p_grid[1,])
+        q = constant_q*np.ones((model.dimq, n,n))     #p=0 for potential
+        grid = np.vstack([q,np.stack([p1,p2])]).reshape(2*model.dimq,-1)
+
     if isinstance(model,nn.Module):
         grid = torch.tensor(grid)
         H = hamiltonian(grid.T.float()).detach().numpy()
@@ -264,7 +286,7 @@ def plot_H_of_traj(model, hamiltonian, trajectory, t_span, color=None, label=Non
 
 
 def plot_l_sym_overq(df,fig=None, ax=None,title=None):
-    s = ax.scatter(df.x, df.y, s=20, c=df.v_hat, cmap='rainbow')
+    s = ax.scatter(df.x, df.y, s=20, c=df.v_hat)
     plt.colorbar(s,ax=ax)
     ax.set_xlabel('q_0')
     ax.set_ylabel('q_1')

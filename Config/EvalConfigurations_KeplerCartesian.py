@@ -114,7 +114,7 @@ Netcfg = {
                 },
             },
         },
-        'tag': '_last-v3'
+        'tag': '_last'
     },
 
 }

@@ -8,7 +8,7 @@ import seaborn as sn
 import Utils.odeUtils as odeUtils
 
 
-def plot_all_states(x_list,t_span,labels,color=None,title=None,y_label='',legend=False):
+def plot_all_states(x_list,t_span,labels,color=None,title=None,y_label='',n=1,legend=False):
     if not color:
         color = sn.color_palette(n_colors=len(x_list)) 
     q_dim = int(x_list[0].shape[0]/2)
@@ -36,7 +36,7 @@ def plot_all_states(x_list,t_span,labels,color=None,title=None,y_label='',legend
                 this_ax = ax1[column_index]
             else:
                 this_ax = ax1[int(column_index/q_dim), column_index%q_dim]
-            this_ax.plot(t_span,x[column_index,:],'*',color=color[i],label=labels[i])
+            this_ax.plot(t_span[::n],x[column_index,::n],'*',color=color[i],label=labels[i])
 
             #getting right ylabels
             if y_label == 'err':
@@ -47,7 +47,7 @@ def plot_all_states(x_list,t_span,labels,color=None,title=None,y_label='',legend
                 this_ax.set_xlabel('time [s]')
 
         if q_dim ==1  and not y_label == 'err':
-            ax3.plot(x[0,:],x[1,:],color=color[i],label=labels[i])
+            ax3.plot(x[0,::n],x[1,::n],color=color[i],label=labels[i])
 
     if legend:
         if ax1.shape == (2,):
@@ -59,7 +59,7 @@ def plot_all_states(x_list,t_span,labels,color=None,title=None,y_label='',legend
     return figs
 
 
-def plot_q_states(x_list,labels,color=None,title=None,legend=False, fig=None, ax=None):
+def plot_q_states(x_list,labels,color=None,title=None,legend=False, fig=None, ax=None, n=1):
     if not color:
         color = sn.color_palette(n_colors=len(x_list)) 
     q_dim = int(x_list[0].shape[0]/2)
@@ -72,7 +72,7 @@ def plot_q_states(x_list,labels,color=None,title=None,legend=False, fig=None, ax
         ax.set_ylabel('q1')
     
         for i,x in enumerate(x_list):
-            ax.plot(x[0,::1],x[1,::1],'*',color=color[i],label=labels[i])
+            ax.plot(x[0,::n],x[1,::n],'*',color=color[i],label=labels[i])
         
         if legend:
             ax.legend()
@@ -252,7 +252,7 @@ def plot_level_sets_constant_q(model,
     return line_list, label_list
 
 
-def plot_conserved_quantity(model,  trajectory, t_span, color=None, linestyle='-',label=None, fig=None, ax=None, title=None):
+def plot_conserved_quantity(model,  trajectory, t_span, color=None, linestyle='-',label=None, fig=None, ax=None, n=1, title=None):
     [q,p] = np.array_split(trajectory,indices_or_sections=2,axis=0)
     symmetries = zip(model.translation_factor, model.rotation_factor)
     nbr_symmetries = model.translation_factor.shape[0]
@@ -266,21 +266,21 @@ def plot_conserved_quantity(model,  trajectory, t_span, color=None, linestyle='-
         I -= I[0,]
         if fig is None:
             fig, ax = plt.subplots()
-        cf = ax.plot(t_span,I,label=label, color=color, linestyle=linestyle)
+        cf = ax.plot(t_span[::n],I[::n],label=label, color=color, linestyle=linestyle)
         ax.legend()
         ax.set_xlabel('time')
-        ax.set_ylabel('I = -p.T (R q-T)')
+        ax.set_ylabel('I = -p.T (R q+T)')
         if title: ax.set_title(title)
 
 
-def plot_H_of_traj(model, hamiltonian, trajectory, t_span, color=None, label=None, fig=None, ax=None,title=None):
+def plot_H_of_traj(model, hamiltonian, trajectory, t_span, color=None, label=None, fig=None, ax=None,n=1,title=None):
     if isinstance(model,nn.Module):
         trajectory = torch.from_numpy(trajectory).T.float()
         H = hamiltonian(trajectory).detach().numpy()
     else: 
         H = hamiltonian(trajectory)
     H -= H[0,]
-    ax.plot(t_span, H, label=label,color=color)
+    ax.plot(t_span[::n], H[::n], label=label,color=color)
     ax.legend()
     if title: ax.set_title(title)
 

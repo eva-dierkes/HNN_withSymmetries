@@ -27,7 +27,7 @@ if __name__ == "__main__":
     criteria = None             #criteria as named in netConfig['train_args']
     criteria_values =  None     #values that should be used for criteria
 
-    save_tikz = True
+    save_tikz = False
 
     for data_config_tag in data_config_list:
         if data_config_tag == 'PendCart':
@@ -175,34 +175,36 @@ if __name__ == "__main__":
             x0 = ref_model.generate_random_inital_value()
         trajectory,_,trajectory_err,_,_ = evalUtils.generate_solution_for_inital_value(None, x0=x0 , ode_list=ode_list,t_start=t_span[0], t_end=t_span[-1], t_span=t_span, labels=label_list, model=ref_model)
         
+        plot_every = 100 if len(t_span)>10000 else 1
+
         ############  Plot all states for trajectory ##############################################################
         
-        plotUtils.plot_all_states(trajectory,t_span, label_list,color=color, title='Example trajectory for different models', y_label='',legend=True)
+        plotUtils.plot_all_states(trajectory,t_span, label_list,color=color, title='Example trajectory for different models', y_label='',n=plot_every,legend=True)
         
         if len(label_list)>1:
-            plotUtils.plot_all_states(trajectory_err,t_span, label_list[1:],color=color[1:], title='Example trajectory for different models', y_label='err',legend=True)
+            plotUtils.plot_all_states(trajectory_err,t_span, label_list[1:],color=color[1:], title='Example trajectory for different models', y_label='err',n=plot_every, legend=True)
         
         fig2, ax2 = plt.subplots(1,len(trajectory))
         fig2.suptitle('Example trajectory')
         for i,(traj,label) in enumerate(zip(trajectory,label_list)):
-            plotUtils.plot_q_states([traj],[label],color=color,title=label,legend=False,fig=fig2, ax=ax2[i])    
+            plotUtils.plot_q_states([traj],[label],color=color,title=label,legend=False,fig=fig2, ax=ax2[i], n=plot_every)    
 
         if save_tikz:
+            tikzplotlib.save(f'Results/{data_config_tag}_S_on_qPlane.tex')
+            plt.close()
             tikzplotlib.save(f'Results/{data_config_tag}_S_err.tex')
             plt.close()
             tikzplotlib.save(f'Results/{data_config_tag}_S.tex')
-            plt.close()
-            tikzplotlib.save(f'Results/{data_config_tag}_S_on_qPlane.tex')
             plt.close()
 
         ############  Plot H's for trajectory ##############################################################
         fig3, ax3 = plt.subplots(3,1)
         for i, (model, hamiltonian) in enumerate(zip(model_list,hamiltonian_list)):
-            plotUtils.plot_H_of_traj(ref_model, ref_model.hamiltonian, trajectory[i], t_span, color=color[i], label=label_list[i],fig=fig3,ax=ax3[1],title='H_exact(traj_theta)' if i==0 else None)   
+            plotUtils.plot_H_of_traj(ref_model, ref_model.hamiltonian, trajectory[i], t_span, color=color[i], label=label_list[i],fig=fig3,ax=ax3[1],n=plot_every,title='H_exact(traj_theta)' if i==0 else None)   
             if '_NN' in label_list[i]:
                 continue
-            plotUtils.plot_H_of_traj(model, hamiltonian, trajectory[0], t_span, color=color[i], label=None,fig=fig3,ax=ax3[0],title='H_theta(traj_exact)' if i==0 else None)   
-            plotUtils.plot_H_of_traj(model, hamiltonian, trajectory[i], t_span, color=color[i], label=None,fig=fig3,ax=ax3[2],title='H_theta(traj_theta)' if i==0 else None) 
+            plotUtils.plot_H_of_traj(model, hamiltonian, trajectory[0], t_span, color=color[i], label=None,fig=fig3,ax=ax3[0],n=plot_every,title='H_theta(traj_exact)' if i==0 else None)   
+            plotUtils.plot_H_of_traj(model, hamiltonian, trajectory[i], t_span, color=color[i], label=None,fig=fig3,ax=ax3[2],n=plot_every,title='H_theta(traj_theta)' if i==0 else None) 
 
         if save_tikz:
             tikzplotlib.save(f'Results/{data_config_tag}_H.tex')

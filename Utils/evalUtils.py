@@ -9,6 +9,7 @@ import pandas as pd
 import Utils.dataUtils as dataUtils
 import Utils.torchUtils as torchUtils
 import Utils.odeUtils as odeUtils
+import Utils.lossUtils as lossUtils
 from Nets import DenseNet, HnnNet, SymHnnNet
 
 
@@ -56,7 +57,7 @@ def generate_solution_for_inital_value(run_index, x0, ode_list, t_start, t_end, 
         return [x,h,x_err,h_err,x0]
 
 
-def load_model(data_config, net_config, nbr_states):    
+def get_model_folder_and_file(data_config, net_config, nbr_states):
     model_file_suffix = dataUtils.create_model_file_name(net_config['train_args'])
 
     # chosse appropiate model structure
@@ -78,11 +79,25 @@ def load_model(data_config, net_config, nbr_states):
         data_config['example'] = data_config['example'] + str(data_config['ode_args']['rotation_angle'] if 'rotation_angle' in data_config['ode_args'] else '')
 
     tag = net_config['tag'] if 'tag' in net_config else ''
-    file_name = data_config['save_dir'] + f'Models/model_{data_config["example"]}_{label}{loss_tag}' + model_file_suffix + tag + '.ckpt'
+
+    save_dir = data_config['save_dir']
+    model_prefix = f'model_{data_config["example"]}_{label}{loss_tag}' + model_file_suffix + tag
+    file_name = save_dir + f'Models/{model_prefix}.ckpt'
+    model_name = f'{data_config["example"]}_'+label+loss_tag+model_file_suffix+tag
+
+    return model, save_dir, file_name, model_prefix, model_name
+
+
+def load_model(data_config, net_config, nbr_states):    
+    
+    model, save_dir, file_name, model_prefix, model_name = get_model_folder_and_file(data_config, net_config, nbr_states)
     print(f'load Model: {file_name}')
     model = model.load_from_checkpoint(file_name)
+    # Select lossfunction if defined in net config
+    if net_config['loss_tag']=='mse':
+        model.lossf = lambda model,x,y,status: lossUtils.my_mse_loss(model,x,y,status)[0]
+
     evalModel = torchUtils.EvalModel(model,requires_grad=False)
-    model_name = f'{data_config["example"]}_'+label+loss_tag+model_file_suffix+tag
 
     return evalModel, model_name, model
 

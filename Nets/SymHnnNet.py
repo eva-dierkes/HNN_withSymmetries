@@ -54,7 +54,7 @@ class SymHnnNet(pl.LightningModule):
 
 
         if symmetry_grid!=None:
-            self.symmetry_grid = symmetry_grid.to('cuda')
+            self.symmetry_grid = symmetry_grid.to(self.device)
 
         self.dropout = nn.Dropout(dropout)
         
@@ -80,7 +80,7 @@ class SymHnnNet(pl.LightningModule):
         y_hat = self.output(x)                            # (dH/dp, -dH/dq)
         loss_hamilton = torch.nn.MSELoss()(y_hat,y)
 
-        if self.current_epoch > nbr_epoch_without_symloss and status!='after' and self.symmetry_type:
+        if (self.current_epoch > nbr_epoch_without_symloss and status!='after' and self.symmetry_type) or status=='eval':
             if status=='train':
                 samples = self.state_sampler(quantity=81)      
                 samples = torch.Tensor(samples).type_as(x)
@@ -101,27 +101,32 @@ class SymHnnNet(pl.LightningModule):
             l_sym /= sym_norm
             l_sym_norm = ((sym_norm)**2 - 1) **2
             
+            loss_dotproduct = 0
             loss_dotproduct_transl = 0
             loss_dotproduct_rot = 0
             for i in range(self.nbr_sym):
                 for j in range(i):
                     loss_dotproduct_transl += (torch.dot(self.translation_factor[i,:],self.translation_factor[j,:]))**2
                     loss_dotproduct_rot += torch.trace(self.rotation_factor[i,:,:] @ self.rotation_factor[j,:,:].T)  # "orthogonal" if ⟨𝐴,𝐵⟩=tr(𝐴𝐵𝑇)=0
-            
-            loss_dotproduct = loss_dotproduct_rot + loss_dotproduct_transl
+                    loss_dotproduct += (loss_dotproduct_rot + loss_dotproduct_transl)**2
+
             loss_symmetry = torch.sum(l_sym)/self.nbr_sym 
             loss_sym_norm = torch.sum(l_sym_norm)/self.nbr_sym 
 
-            smooth_sym_factor = self.get_sym_loss_factor(current_epoch=self.current_epoch,
-                                                        start_increasing= nbr_epoch_without_symloss,
-                                                        end_increasing  = nbr_epoch_without_symloss+nbr_smoothing_epochs)
+            if status=='eval':
+                smooth_sym_factor = 1
+            else:
+                smooth_sym_factor = self.get_sym_loss_factor(current_epoch=self.current_epoch,
+                                                            start_increasing= nbr_epoch_without_symloss,
+                                                            end_increasing  = nbr_epoch_without_symloss+nbr_smoothing_epochs)
         else:
             loss_symmetry = 0
             loss_sym_norm = 0
             loss_dotproduct = 0
             smooth_sym_factor = 0
             
-        loss = loss_hamilton + smooth_sym_factor*0.5*(loss_symmetry + loss_sym_norm + loss_dotproduct)
+        loss_sym = (loss_symmetry + loss_sym_norm + loss_dotproduct) 
+        loss = loss_hamilton + smooth_sym_factor*0.5*loss_sym
 
         if status != 'after':
             self.log(f'{status}/smooth_sym_factor',smooth_sym_factor, prog_bar=False, on_epoch=True, on_step=False)
@@ -144,7 +149,7 @@ class SymHnnNet(pl.LightningModule):
                         for rot_row in range(self.dimq):
                             self.log(f'rotMatrix{i}/rot_factor[{rot_row},{rot_col}]',self.rotation_factor[i,rot_row,rot_col],prog_bar=False, on_epoch=True, on_step=False)
                     self.log(f'rotMatrix{i}/||rotMatrix||^2',torch.norm(self.rotation_factor[i,:,:])**2,prog_bar=False, on_epoch=True, on_step=False)
-        return loss
+        return loss, loss_hamilton, loss_sym
         
     def forward(self,x):
         for l in self.linears[:-1]:
